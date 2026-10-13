@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#00D4FF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Ultron">
+    <link rel="manifest" href="manifest.json">
+    <title>Ultron</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { height: 100%; overflow: hidden; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #050A15;
+            color: #E0F4FF;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(90deg, #0A1220 0%, #0d1a2e 100%);
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #1a2a44;
+            flex-shrink: 0;
+            box-shadow: 0 2px 12px rgba(0, 212, 255, 0.08);
+        }
+        header .logo {
+            width: 36px; height: 36px;
+            background: radial-gradient(circle, #00D4FF 0%, #0078a8 100%);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 0 16px rgba(0, 212, 255, 0.6);
+            animation: pulse 2.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 12px rgba(0, 212, 255, 0.5); }
+            50% { box-shadow: 0 0 24px rgba(0, 212, 255, 0.9); }
+        }
+        header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #00D4FF;
+            letter-spacing: 0.5px;
+        }
+        header .status {
+            margin-left: auto;
+            font-size: 11px;
+            color: #4a9cc7;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        header .status::before {
+            content: '';
+            width: 8px; height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00ff88;
+            animation: blink 2s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* CHAT */
+        #chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 14px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scroll-behavior: smooth;
+        }
+        .msg {
+            max-width: 82%;
+            padding: 11px 15px;
+            border-radius: 18px;
+            font-size: 15px;
+            line-height: 1.45;
+            word-wrap: break-word;
+            animation: fadeIn 0.25s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .msg.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #0078a8, #00a8d4);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .msg.bot {
+            align-self: flex-start;
+            background: #0d1a2e;
+            color: #E0F4FF;
+            border: 1px solid #1a2a44;
+            border-bottom-left-radius: 4px;
+        }
+        .msg.bot.typing {
+            color: #4a9cc7;
+            font-style: italic;
+        }
+        .typing-dots::after {
+            content: '...';
+            animation: dots 1.4s steps(4, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* INPUT */
+        footer {
+            padding: 12px 14px 16px;
+            background: #0A1220;
+            border-top: 1px solid #1a2a44;
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        #input {
+            flex: 1;
+            padding: 14px 18px;
+            background: #0d1a2e;
+            border: 1px solid #1a2a44;
+            border-radius: 24px;
+            color: #E0F4FF;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        #input:focus {
+            border-color: #00D4FF;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+        #input::placeholder { color: #4a7a99; }
+        #send {
+            width: 52px; height: 52px;
+            background: linear-gradient(135deg, #00D4FF, #0078a8);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.15s, box-shadow 0.2s;
+            box-shadow: 0 0 16px rgba(0, 212, 255, 0.4);
+        }
+        #send:active { transform: scale(0.92); }
+        #send:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* LOGIN */
+        #login {
+            position: fixed;
+            inset: 0;
+            background: #050A15;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            z-index: 100;
+        }
+        #login .logo-big {
+            width: 90px; height: 90px;
+            background: radial-gradient(circle, #00D4FF 0%, #0078a8 100%);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 44px;
+            margin-bottom: 24px;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.6);
+            animation: pulse 2.5s ease-in-out infinite;
+        }
+        #login h2 {
+            color: #00D4FF;
+            margin-bottom: 8px;
+            font-size: 24px;
+        }
+        #login p {
+            color: #4a7a99;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        #senha {
+            width: 100%;
+            max-width: 320px;
+            padding: 16px 20px;
+            background: #0d1a2e;
+            border: 1px solid #1a2a44;
+            border-radius: 14px;
+            color: #E0F4FF;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+            margin-bottom: 16px;
+        }
+        #senha:focus { border-color: #00D4FF; }
+        #entrar {
+            width: 100%;
+            max-width: 320px;
+            padding: 16px;
+            background: linear-gradient(135deg, #00D4FF, #0078a8);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+        #entrar:active { transform: scale(0.98); }
+        .erro { color: #ff4466; font-size: 13px; margin-top: 12px; }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN -->
+    <div id="login">
+        <div class="logo-big">🤖</div>
+        <h2>ULTRON</h2>
+        <p>Digite a senha para entrar</p>
+        <input type="password" id="senha" placeholder="Senha" autocomplete="off">
+        <button id="entrar">ENTRAR</button>
+        <div class="erro" id="erro"></div>
+    </div>
+
+    <!-- APP -->
+    <header>
+        <div class="logo">🤖</div>
+        <h1>ULTRON</h1>
+        <div class="status">online</div>
+    </header>
+
+    <div id="chat"></div>
+
+    <footer>
+        <input type="text" id="input" placeholder="Digite uma mensagem..." autocomplete="off">
+        <button id="send">➤</button>
+    </footer>
+
+    <script>
+        // ============================================================
+        // CONFIGURACAO
+        // ============================================================
+        const API_URL = "https://machinery-finder-solo-railway.trycloudflare.com/chat";
+        const API_KEY = "ultron-secret-2026";
+        const SENHA_APP = "ultron2026";   // senha pra entrar no app
+
+        // ============================================================
+        // ESTADO
+        // ============================================================
+        let usuarioId = "user_" + Math.random().toString(36).substring(7);
+        let enviando = false;
+
+        const chat = document.getElementById("chat");
+        const input = document.getElementById("input");
+        const send = document.getElementById("send");
+        const login = document.getElementById("login");
+        const senhaInput = document.getElementById("senha");
+        const entrarBtn = document.getElementById("entrar");
+        const erro = document.getElementById("erro");
+
+        // ============================================================
+        // LOGIN
+        // ============================================================
+        entrarBtn.addEventListener("click", () => {
+            if (senhaInput.value === SENHA_APP) {
+                localStorage.setItem("ultron_logado", "sim");
+                login.style.display = "none";
+                boasVindas();
+            } else {
+                erro.textContent = "Senha incorreta";
+            }
+        });
+        senhaInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") entrarBtn.click();
+        });
+
+        // auto-login
+        if (localStorage.getItem("ultron_logado") === "sim") {
+            login.style.display = "none";
+            boasVindas();
+        } else {
+            senhaInput.focus();
+        }
+
+        // ============================================================
+        // CHAT
+        // ============================================================
+        function boasVindas() {
+            adicionarMensagem("bot", "E aí! Sou o Ultron. Manda uma mensagem pra começar! 🤖");
+            input.focus();
+        }
+
+        function adicionarMensagem(tipo, texto) {
+            const div = document.createElement("div");
+            div.className = "msg " + tipo;
+            div.textContent = texto;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+            return div;
+        }
+
+        async function enviar() {
+            const texto = input.value.trim();
+            if (!texto || enviando) return;
+
+            enviando = true;
+            input.value = "";
+            input.disabled = true;
+            send.disabled = true;
+
+            adicionarMensagem("user", texto);
+
+            const typing = adicionarMensagem("bot typing", "Ultron está pensando");
+            typing.innerHTML = 'Ultron está pensando<span class="typing-dots"></span>';
+
+            try {
+                const r = await fetch(API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-api-key": API_KEY
+                    },
+                    body: JSON.stringify({
+                        texto: texto,
+                        usuario_id: usuarioId
+                    })
+                });
+
+                if (!r.ok) throw new Error("Erro " + r.status);
+
+                const data = await r.json();
+                typing.remove();
+                adicionarMensagem("bot", data.resposta);
+            } catch (e) {
+                typing.remove();
+                adicionarMensagem("bot", "❌ Erro ao conectar: " + e.message);
+            } finally {
+                enviando = false;
+                input.disabled = false;
+                send.disabled = false;
+                input.focus();
+            }
+        }
+
+        send.addEventListener("click", enviar);
+        input.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") enviar();
+        });
+
+        // ============================================================
+        // SERVICE WORKER (PWA)
+        // ============================================================
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("sw.js").catch(() => {});
+        }
+    </script>
+</body>
+</html>
