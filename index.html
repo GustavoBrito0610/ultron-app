@@ -20,7 +20,6 @@
             flex-direction: column;
         }
 
-        /* HEADER */
         header {
             background: linear-gradient(90deg, #0A1220 0%, #0d1a2e 100%);
             padding: 14px 18px;
@@ -70,8 +69,17 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.4; }
         }
+        header .btn-clear {
+            background: transparent;
+            border: 1px solid #1a2a44;
+            color: #4a9cc7;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        header .btn-clear:hover { border-color: #ff4466; color: #ff4466; }
 
-        /* CHAT */
         #chat {
             flex: 1;
             overflow-y: auto;
@@ -81,27 +89,29 @@
             gap: 12px;
             scroll-behavior: smooth;
         }
+        .msg-wrap { display: flex; align-items: flex-end; gap: 6px; max-width: 88%; }
+        .msg-wrap.user { align-self: flex-end; flex-direction: row-reverse; }
+        .msg-wrap.bot { align-self: flex-start; }
+
         .msg {
-            max-width: 82%;
             padding: 11px 15px;
             border-radius: 18px;
             font-size: 15px;
             line-height: 1.45;
             word-wrap: break-word;
             animation: fadeIn 0.25s ease;
+            white-space: pre-wrap;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .msg.user {
-            align-self: flex-end;
             background: linear-gradient(135deg, #0078a8, #00a8d4);
             color: white;
             border-bottom-right-radius: 4px;
         }
         .msg.bot {
-            align-self: flex-start;
             background: #0d1a2e;
             color: #E0F4FF;
             border: 1px solid #1a2a44;
@@ -121,13 +131,26 @@
             60%, 100% { content: '...'; }
         }
 
-        /* INPUT */
+        .btn-speak {
+            background: transparent;
+            border: 1px solid #1a2a44;
+            color: #4a9cc7;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-speak:hover { border-color: #00D4FF; color: #00D4FF; }
+
         footer {
             padding: 12px 14px 16px;
             background: #0A1220;
             border-top: 1px solid #1a2a44;
             display: flex;
-            gap: 10px;
+            gap: 8px;
+            align-items: center;
             flex-shrink: 0;
         }
         #input {
@@ -146,26 +169,40 @@
             box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
         }
         #input::placeholder { color: #4a7a99; }
-        #send {
+
+        .btn-icone {
             width: 52px; height: 52px;
-            background: linear-gradient(135deg, #00D4FF, #0078a8);
-            border: none;
+            background: #0d1a2e;
+            border: 1px solid #1a2a44;
             border-radius: 50%;
-            color: white;
-            font-size: 22px;
+            color: #4a9cc7;
+            font-size: 20px;
             cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            transition: transform 0.15s, box-shadow 0.2s;
-            box-shadow: 0 0 16px rgba(0, 212, 255, 0.4);
+            flex-shrink: 0;
+            transition: all 0.15s;
         }
-        #send:active { transform: scale(0.92); }
-        #send:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            box-shadow: none;
+        .btn-icone:hover { border-color: #00D4FF; color: #00D4FF; }
+        .btn-icone:active { transform: scale(0.92); }
+        .btn-icone.gravando {
+            background: #ff3060;
+            color: white;
+            border-color: #ff3060;
+            animation: pulse-rec 1s ease-in-out infinite;
+        }
+        @keyframes pulse-rec {
+            0%, 100% { box-shadow: 0 0 12px rgba(255, 48, 96, 0.6); }
+            50% { box-shadow: 0 0 24px rgba(255, 48, 96, 1); }
         }
 
-        /* LOGIN */
+        #send {
+            background: linear-gradient(135deg, #00D4FF, #0078a8);
+            border: none;
+            color: white;
+            box-shadow: 0 0 16px rgba(0, 212, 255, 0.4);
+        }
+        #send:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
         #login {
             position: fixed;
             inset: 0;
@@ -187,16 +224,8 @@
             box-shadow: 0 0 40px rgba(0, 212, 255, 0.6);
             animation: pulse 2.5s ease-in-out infinite;
         }
-        #login h2 {
-            color: #00D4FF;
-            margin-bottom: 8px;
-            font-size: 24px;
-        }
-        #login p {
-            color: #4a7a99;
-            margin-bottom: 24px;
-            font-size: 14px;
-        }
+        #login h2 { color: #00D4FF; margin-bottom: 8px; font-size: 24px; }
+        #login p { color: #4a7a99; margin-bottom: 24px; font-size: 14px; }
         #senha {
             width: 100%;
             max-width: 320px;
@@ -230,7 +259,6 @@
 </head>
 <body>
 
-    <!-- LOGIN -->
     <div id="login">
         <div class="logo-big">🤖</div>
         <h2>ULTRON</h2>
@@ -240,37 +268,46 @@
         <div class="erro" id="erro"></div>
     </div>
 
-    <!-- APP -->
     <header>
         <div class="logo">🤖</div>
         <h1>ULTRON</h1>
+        <button class="btn-clear" id="btn-clear" title="Limpar conversa">🗑️</button>
         <div class="status">online</div>
     </header>
 
     <div id="chat"></div>
 
     <footer>
+        <button class="btn-icone" id="btn-mic" title="Falar">🎤</button>
         <input type="text" id="input" placeholder="Digite uma mensagem..." autocomplete="off">
-        <button id="send">➤</button>
+        <button class="btn-icone" id="send" title="Enviar">➤</button>
     </footer>
 
     <script>
         // ============================================================
-        // CONFIGURACAO
+        // CONFIG
         // ============================================================
         const API_URL = "https://machinery-finder-solo-railway.trycloudflare.com/chat";
         const API_KEY = "ultron-secret-2026";
-        const SENHA_APP = "ultron2026";   // senha pra entrar no app
+        const SENHA_APP = "ultron2026";
+        const MAX_HIST = 20;   // maximo de mensagens do historico enviado
 
         // ============================================================
         // ESTADO
         // ============================================================
-        let usuarioId = "user_" + Math.random().toString(36).substring(7);
+        let usuarioId = localStorage.getItem("ultron_user_id") || ("user_" + Math.random().toString(36).substring(7));
+        localStorage.setItem("ultron_user_id", usuarioId);
+
+        let historico = JSON.parse(localStorage.getItem("ultron_historico") || "[]");
         let enviando = false;
+        let gravando = false;
+        let vozAtiva = localStorage.getItem("ultron_voz") !== "off";
 
         const chat = document.getElementById("chat");
         const input = document.getElementById("input");
         const send = document.getElementById("send");
+        const btnMic = document.getElementById("btn-mic");
+        const btnClear = document.getElementById("btn-clear");
         const login = document.getElementById("login");
         const senhaInput = document.getElementById("senha");
         const entrarBtn = document.getElementById("entrar");
@@ -283,7 +320,7 @@
             if (senhaInput.value === SENHA_APP) {
                 localStorage.setItem("ultron_logado", "sim");
                 login.style.display = "none";
-                boasVindas();
+                iniciar();
             } else {
                 erro.textContent = "Senha incorreta";
             }
@@ -292,29 +329,48 @@
             if (e.key === "Enter") entrarBtn.click();
         });
 
-        // auto-login
-        if (localStorage.getItem("ultron_logado") === "sim") {
-            login.style.display = "none";
-            boasVindas();
-        } else {
-            senhaInput.focus();
-        }
-
         // ============================================================
         // CHAT
         // ============================================================
-        function boasVindas() {
-            adicionarMensagem("bot", "E aí! Sou o Ultron. Manda uma mensagem pra começar! 🤖");
-            input.focus();
-        }
+        function adicionarMensagem(tipo, texto, salvar = true) {
+            const wrap = document.createElement("div");
+            wrap.className = "msg-wrap " + tipo;
 
-        function adicionarMensagem(tipo, texto) {
             const div = document.createElement("div");
             div.className = "msg " + tipo;
             div.textContent = texto;
-            chat.appendChild(div);
+            wrap.appendChild(div);
+
+            if (tipo === "bot" && salvar) {
+                const btnSpeak = document.createElement("button");
+                btnSpeak.className = "btn-speak";
+                btnSpeak.textContent = "🔊";
+                btnSpeak.title = "Ouvir";
+                btnSpeak.onclick = () => falar(texto);
+                wrap.appendChild(btnSpeak);
+            }
+
+            chat.appendChild(wrap);
             chat.scrollTop = chat.scrollHeight;
-            return div;
+
+            if (salvar) {
+                historico.push({ role: tipo === "user" ? "user" : "assistant", content: texto });
+                if (historico.length > 100) historico = historico.slice(-100);
+                localStorage.setItem("ultron_historico", JSON.stringify(historico));
+            }
+
+            return wrap;
+        }
+
+        function renderHistorico() {
+            chat.innerHTML = "";
+            if (historico.length === 0) {
+                adicionarMensagem("bot", "E aí! Sou o Ultron. Manda uma mensagem pra começar! 🤖", false);
+            } else {
+                for (const m of historico) {
+                    adicionarMensagem(m.role === "user" ? "user" : "bot", m.content, false);
+                }
+            }
         }
 
         async function enviar() {
@@ -328,8 +384,17 @@
 
             adicionarMensagem("user", texto);
 
-            const typing = adicionarMensagem("bot typing", "Ultron está pensando");
-            typing.innerHTML = 'Ultron está pensando<span class="typing-dots"></span>';
+            const wrapTyping = document.createElement("div");
+            wrapTyping.className = "msg-wrap bot";
+            wrapTyping.innerHTML = '<div class="msg bot typing">Ultron está pensando<span class="typing-dots"></span></div>';
+            chat.appendChild(wrapTyping);
+            chat.scrollTop = chat.scrollHeight;
+
+            // Histórico das ultimas N mensagens (sem contar a atual)
+            const histEnviado = historico.slice(-MAX_HIST - 1, -1).map(m => ({
+                role: m.role,
+                content: m.content
+            }));
 
             try {
                 const r = await fetch(API_URL, {
@@ -340,18 +405,21 @@
                     },
                     body: JSON.stringify({
                         texto: texto,
-                        usuario_id: usuarioId
+                        usuario_id: usuarioId,
+                        historico: histEnviado
                     })
                 });
 
                 if (!r.ok) throw new Error("Erro " + r.status);
 
                 const data = await r.json();
-                typing.remove();
+                wrapTyping.remove();
                 adicionarMensagem("bot", data.resposta);
+
+                if (vozAtiva) falar(data.resposta);
             } catch (e) {
-                typing.remove();
-                adicionarMensagem("bot", "❌ Erro ao conectar: " + e.message);
+                wrapTyping.remove();
+                adicionarMensagem("bot", "❌ Erro ao conectar: " + e.message, false);
             } finally {
                 enviando = false;
                 input.disabled = false;
@@ -366,8 +434,109 @@
         });
 
         // ============================================================
-        // SERVICE WORKER (PWA)
+        // LIMPAR CONVERSA
         // ============================================================
+        btnClear.addEventListener("click", () => {
+            if (confirm("Apagar toda a conversa?")) {
+                historico = [];
+                localStorage.setItem("ultron_historico", "[]");
+                renderHistorico();
+            }
+        });
+
+        // ============================================================
+        // VOZ (TTS - browser)
+        // ============================================================
+        function falar(texto) {
+            if (!("speechSynthesis" in window)) return;
+            speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(texto);
+            u.lang = "pt-BR";
+            u.rate = 1.05;
+            u.pitch = 1.0;
+            // Tenta escolher uma voz pt-BR
+            const vozes = speechSynthesis.getVoices();
+            const ptBR = vozes.find(v => v.lang === "pt-BR");
+            if (ptBR) u.voice = ptBR;
+            speechSynthesis.speak(u);
+        }
+
+        // carrega vozes quando disponivel
+        if ("speechSynthesis" in window) {
+            speechSynthesis.onvoiceschanged = () => {};
+        }
+
+        // ============================================================
+        // MICROFONE (STT - browser)
+        // ============================================================
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.lang = "pt-BR";
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onresult = (e) => {
+                const texto = e.results[0][0].transcript;
+                input.value = texto;
+                enviar();
+            };
+
+            recognition.onerror = (e) => {
+                console.error("Erro mic:", e.error);
+                pararMic();
+            };
+
+            recognition.onend = () => {
+                pararMic();
+            };
+        }
+
+        function iniciarMic() {
+            if (!recognition) {
+                alert("Seu navegador não suporta microfone. Use Chrome ou Edge.");
+                return;
+            }
+            try {
+                recognition.start();
+                gravando = true;
+                btnMic.classList.add("gravando");
+                btnMic.textContent = "⏹";
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function pararMic() {
+            gravando = false;
+            btnMic.classList.remove("gravando");
+            btnMic.textContent = "🎤";
+            try { recognition && recognition.stop(); } catch(e){}
+        }
+
+        btnMic.addEventListener("click", () => {
+            if (gravando) pararMic();
+            else iniciarMic();
+        });
+
+        // ============================================================
+        // INICIAR
+        // ============================================================
+        function iniciar() {
+            renderHistorico();
+            input.focus();
+        }
+
+        if (localStorage.getItem("ultron_logado") === "sim") {
+            login.style.display = "none";
+            iniciar();
+        } else {
+            senhaInput.focus();
+        }
+
+        // service worker
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("sw.js").catch(() => {});
         }
